@@ -1,14 +1,62 @@
 import React, { Component } from 'react';
 import storeData from "./store_directory.json";
-
 import GoogleMapReact from 'google-map-react';
 import { render } from 'react-dom';
 import Geocode from "react-geocode";
 
-/*
-* Use this component as a launching-pad to build your functionality.
-*
-*/
+Geocode.setApiKey("AIzaSyCVH8e45o3d-5qmykzdhGKd1-3xYua5D2A");
+Geocode.setLanguage("es");
+Geocode.setRegion("mx");
+
+var vari = [];
+
+function eliminarFav(ev){
+  var r = confirm("Eliminar de favoritos?");
+  if (r == true) {
+    var node;
+    node=document.getElementById(ev);
+    node.parentNode.removeChild(node);
+    var tamano = vari.length;
+    for(var i = 0; i < tamano; i++){
+      if(vari[i]==ev-1){
+          vari.splice(i,1);
+      }
+    }
+  }
+} 
+
+function agregarFav(ev) {
+  var txt;
+  var num;
+  var i;
+  var tamano = vari.length;
+  var flag = true;
+  var r = confirm("Agregar a favoritos?");
+    if (r == true) {
+      for(i = 0; i < tamano; i++){
+        if(vari[i]==ev){
+          flag = false;
+        }
+      }
+
+      if(flag){
+        vari[tamano] = ev;
+        num = (ev * 1) +1;
+        txt = "Tienda "+num;
+        var node = document.createElement("li");
+        node.id=num;
+        node.addEventListener("click",  function() { eliminarFav(num)});
+        var textnode = document.createTextNode(txt);
+        node.appendChild(textnode);
+        document.getElementById("favorites").appendChild(node);
+      }else{
+        alert("Esa tienda ya esta en tu lista");
+      }
+    } 
+}
+
+
+
 const Marker = (props: any) => {
     const { color, name, id } = props;
     return (
@@ -20,59 +68,11 @@ const Marker = (props: any) => {
     );
   };
 
-
-
-Geocode.setApiKey("AIzaSyCVH8e45o3d-5qmykzdhGKd1-3xYua5D2A");
-Geocode.setLanguage("es");
-Geocode.setRegion("mx");
-
-var vari = [];
-
-function shoot(ev) {
-var txt;
-var num;
-var i;
-var tamano = vari.length;
-var flag = true;
-  var r = confirm("Agregar a favoritos?");
-  if (r == true) {
-    for(i = 0; i < tamano; i++){
-      if(vari[i]==ev){
-            flag = false;
-      }
-
-    }
-    if(flag){
-
-
-    vari[tamano] = ev;
-
-    num = (ev * 1) +1;
-    txt = "Tienda "+num;
-    var node = document.createElement("LI");
-    var textnode = document.createTextNode(txt);
-    node.appendChild(textnode);
-    document.getElementById("favorites").appendChild(node);
-    }else{
-      alert("Esa tienda ya esta en tu lista");
-    }
-  } else {
-    
-  }
-
-}
-
-
-
-
-
 export default class YourComponent extends Component {
   
 
   static defaultProps = {
    center: {lat: 19.432608, lng: -99.133209},
-   //center: {lat: {lati}, lng: {long}}, 
- 
    zoom: 12
   }
 
@@ -80,8 +80,21 @@ export default class YourComponent extends Component {
 
 
   render() {
-
-
+      // fetch('./store_directory.json')
+      // .then((res) => res.json())
+      // .then((data) => {
+      //   for (var i = 0; i < data.length; i++)
+      //     {   
+      //       var obj = data[i];
+      //       Geocode.fromAddress(obj.Address).then(
+      //       response => {
+      //         let { lat, lng } = response.results[0].geometry.location;
+      //         var marcadores = "<Marker lat={"+lat+"} lng={"+lng+"} name="+obj.Name+" color='red' />"
+      //         console.log(marcadores);
+      //       }
+      //       );
+      //     }
+      //   })
     return (
       <div >
       
@@ -96,29 +109,13 @@ export default class YourComponent extends Component {
             defaultZoom={this.props.zoom}
             onChildMouseEnter={this.onChildMouseEnter}
             onChildMouseLeave={this.onChildMouseLeave}
-            onChildClick={(ev) => shoot(ev)}
+            onChildClick={(ev) => agregarFav(ev)}
           >
 
-
-
-{Object.entries(storeData).map((postData, i) => {
-
-
-               Geocode.fromAddress(postData.Address).then(
-               response => {
-                 let { lat, lng } = response.results[0].geometry.location;
-               }
-             );
-           <Marker
-   lat= {lat}
-             lng= {lng}
-             name=  {postData.Name}
-             color="blue"
-
-           />
-
-           })}
           
+    
+
+
           <Marker
             lat={19.432608}
             lng={-99.133209}
@@ -136,8 +133,8 @@ export default class YourComponent extends Component {
             lng={-99.148220}
             name="Tienda 3"
             color="red"
-          >
-          </Marker>
+          />
+          
 
           </GoogleMapReact>
 
@@ -154,7 +151,7 @@ export default class YourComponent extends Component {
     );
   }
 }
-          
+
 
 
 
